@@ -51,7 +51,7 @@ textarea{width:100%;height:90px;font-size:12px}
 .fr{display:grid;grid-template-columns:1fr 64px 64px;gap:6px;align-items:center;margin:5px 0;font-size:13px}.fr input{width:100%;padding:5px 7px}
 </style>
 <link href="https://fonts.googleapis.com/css2?family=Huninn&display=swap" rel="stylesheet"></head><body><main>
-<h1>🐷 我的 ETF 小帳本</h1>
+<div style="display:flex;justify-content:space-between;align-items:center"><h1>🐷 我的 ETF 小帳本</h1><button class="s" id="lk" onclick="lock()" style="display:none">🔒 鎖定</button></div>
 <div class="chips" id="chips"></div>
 <div id="hero"></div>
 <nav class="tabs" id="tabs"></nav>
@@ -76,12 +76,35 @@ lots:[['0050','2025-06-18',600,47.27],['0050','2025-09-11',50,55.65],['0050','20
 ['009810','2025-09-04',1000,16.48],['009810','2025-12-09',300,18.46],['009810','2026-01-16',350,18.93],
 ['2330','2026-02-24',20,1920],['2330','2026-03-09',5,1793],['2330','2026-03-30',2,1790],['2330','2026-04-15',1,2090],['2330','2026-05-11',2,2235],['2330','2026-06-18',2,2400],['2330','2026-06-29',2,2373],['2330','2026-07-28',2,2293],['2330','2026-09-15',2,2395]]};
 
-const KEY='etf-tracker-v1';let S=null;
-try{S=JSON.parse(localStorage.getItem(KEY))}catch(e){}
-if(!S||!S.lots)S=JSON.parse(JSON.stringify(D0));
+const KEY='etf-tracker-v1',EK='etf-tracker-enc';let S=null,CK=null,SALT=null;
+const enc=new TextEncoder(),dec=new TextDecoder();
+const b64=u=>btoa(String.fromCharCode(...new Uint8Array(u))),ub=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+async function dk(pin,salt){const m=await crypto.subtle.importKey('raw',enc.encode(pin),'PBKDF2',false,['deriveKey']);return crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:200000,hash:'SHA-256'},m,{name:'AES-GCM',length:256},false,['encrypt','decrypt'])}
+async function seal(){const iv=crypto.getRandomValues(new Uint8Array(12));const ct=await crypto.subtle.encrypt({name:'AES-GCM',iv},CK,enc.encode(JSON.stringify(S)));return JSON.stringify({s:b64(SALT),i:b64(iv),d:b64(ct)})}
+async function openBlob(blob,pin){const o=JSON.parse(blob),salt=ub(o.s),k=await dk(pin,salt);const pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:ub(o.i)},k,ub(o.d));return{data:JSON.parse(dec.decode(pt)),k,salt}}
 function fix(){if(!S.sched)S.sched=JSON.parse(JSON.stringify(D0.sched));if(!S.sells)S.sells=[];if(!S.divAct)S.divAct={};if(!S.mdiv)S.mdiv=[];if(!S.divMode)S.divMode='est'}
-fix();
-function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+let sv=Promise.resolve();
+function save(){if(!S||!CK)return;sv=sv.then(async()=>{try{localStorage.setItem(EK,await seal())}catch(e){}})}
+let fails=0,until=0,hid=0;
+function lockUI(msg){const first=!localStorage.getItem(EK);
+$('lk').style.display='none';$('chips').innerHTML='';$('tabs').innerHTML='';$('hero').innerHTML='';
+$('v').innerHTML=`<div class="card hero" style="text-align:center"><div style="font-size:54px">🔒</div><b>${first?'第一次使用：設定你的 PIN':'輸入 PIN 解鎖'}</b><div class="mu">${first?'PIN 只有你知道，不會被儲存或上傳，連我也看不到。你的資料會用它加密。忘記 PIN 就無法救回，請記好。':'解鎖後才看得到你的資料。'}</div></div>
+<div class="card f"><input type="password" id="pin" class="w" placeholder="${first?'設定 PIN（建議 6 碼以上）':'PIN'}" autocomplete="off">${first?'<input type="password" id="pin2" class="w" placeholder="再輸入一次">':''}<div class="mu w" id="pmsg">${msg||''}</div><button class="w" onclick="unlock()">${first?'設定並進入':'解鎖'}</button>${first?'':'<button class="s w" onclick="wipe()">忘記 PIN？清除這支手機上的資料</button>'}</div>`}
+async function unlock(){const pin=$('pin').value,first=!localStorage.getItem(EK);
+if(Date.now()<until){$('pmsg').textContent='請稍等幾秒再試';return}
+if(pin.length<4){$('pmsg').textContent='至少 4 個字元';return}
+$('pmsg').textContent='處理中…';
+try{if(first){if(pin!==$('pin2').value){$('pmsg').textContent='兩次輸入不一樣';return}
+let d=null;try{d=JSON.parse(localStorage.getItem(KEY))}catch(e){}
+S=(d&&d.lots)?d:JSON.parse(JSON.stringify(D0));fix();SALT=crypto.getRandomValues(new Uint8Array(16));CK=await dk(pin,SALT);localStorage.setItem(EK,await seal());localStorage.removeItem(KEY)}
+else{const r=await openBlob(localStorage.getItem(EK),pin);S=r.data;CK=r.k;SALT=r.salt;fix();fails=0}
+start()}catch(e){fails++;until=Date.now()+Math.min(30,fails*2)*1000;S=null;CK=null;$('pmsg').textContent='PIN 不正確'}}
+function start(){F='all';TAB='sum';$('lk').style.display='';render()}
+function lock(){S=null;CK=null;LC=null;lockUI()}
+function wipe(){if(confirm('這會刪除這支手機上的所有記錄，無法復原（除非你有備份）。確定嗎？')){localStorage.removeItem(EK);localStorage.removeItem(KEY);lockUI()}}
+async function chpin(){const a=prompt('新的 PIN（至少 4 個字元）');if(!a||a.length<4)return;if(prompt('再輸入一次')!==a){alert('兩次不一樣');return}SALT=crypto.getRandomValues(new Uint8Array(16));CK=await dk(a,SALT);save();alert('PIN 已更新')}
+function boot(){if(!window.crypto||!crypto.subtle){$('v').innerHTML='<div class="card">這個瀏覽器不支援加密功能，無法使用。請改用較新的 Safari 或 Chrome。</div>';return}lockUI()}
+document.addEventListener('visibilitychange',()=>{if(document.hidden)hid=Date.now();else if(S&&hid&&Date.now()-hid>3*60*1000)lock()});
 let F='all',TAB='sum',RT='all',LC=null;
 const $=i=>document.getElementById(i),f0=n=>Math.round(n).toLocaleString('zh-TW'),sg=n=>(n>0?'+':n<0?'−':'')+f0(Math.abs(n)),cl=n=>n>0?'up':n<0?'dn':'';
 const has=v=>v!==undefined&&v!==null&&v!=='';
@@ -165,7 +188,7 @@ if(TAB==='set')h=`<div class="card"><b>🌼 股息計算方式</b><div class="mu
 <select id="dm" style="margin-top:6px;width:100%"><option value="est" ${S.divMode==='est'?'selected':''}>估算，有填實收就用實收</option><option value="manual" ${S.divMode==='manual'?'selected':''}>只算我輸入的</option></select></div>
 <div class="card"><b>🏷️ 費率</b><div class="mu">內扣費率（每年 %）與買賣手續費。內扣費已含在股價裡，這裡只用來估算被扣了多少。</div>
 <div class="fr"><span>手續費 %／最低元</span><input type="number" step="0.0001" data-s="rate" value="${S.set.rate}"><input type="number" data-s="min" value="${S.set.min}"></div><div class="fr mu"><span></span><span>經理費</span><span>保管費</span></div>${Object.keys(S.funds).filter(c=>S.funds[c].t==='etf').map(c=>`<div class="fr"><span>${nm(c)}</span><input type="number" step="0.005" data-m="${c}" value="${S.funds[c].m}"><input type="number" step="0.005" data-c="${c}" value="${S.funds[c].c}"></div>`).join('')}</div>
-<div class="card"><b>💾 備份與還原</b><div class="mu">資料只存在這支手機的瀏覽器裡。換手機或清除瀏覽器資料前，請先「匯出」並存到備忘錄。</div><textarea id="bk"></textarea><p><button class="s" onclick="exp()">匯出</button> <button class="s" onclick="imp()">匯入還原</button></p></div>
+<div class="card"><b>💾 備份與還原</b><div class="mu">資料加密後只存在這支手機的瀏覽器裡。換手機或清除瀏覽器資料前，請先「匯出」並存到備忘錄；匯出內容已加密，還原時要輸入當時的 PIN。</div><textarea id="bk"></textarea><p><button class="s" onclick="exp()">匯出</button> <button class="s" onclick="imp()">匯入還原</button> <button class="s" onclick="chpin()">更改 PIN</button></p><div class="mu">離開頁面超過 3 分鐘會自動鎖定。</div></div>
 <div class="mu">內扣費用為估算值；賣出費用與券商可能有小差異。</div>`;
 $('v').innerHTML=h;if(TAB==='sim'){$('mp').value=S.prices[$('mc').value]||'';sim()}if(TAB==='rec')rtf()}
 function rtf(){const t=$('rt').value;$('rq').style.display=$('rp').style.display=$('rf').style.display=t==='div'?'none':'';$('rx').style.display=t==='sell'?'':'none';$('ra').style.display=t==='div'?'':'none';$('rdl').textContent=t==='div'?'入帳日期':'成交日期'}
@@ -184,8 +207,8 @@ else{if(!(q>0)||!(p>0)){alert('請填股數與成交價');return}
 if(t==='buy'){S.lots.push([c,d,q,p,fx===''?null:+fx]);S.prices[c]=S.prices[c]||p}
 else{const r=LC.R[c];if(!r||r.q<q){alert('目前持有 '+(r?r.q:0)+' 股，不夠賣 '+q+' 股');return}S.sells.push([c,d,q,p,fx===''?null:+fx,tx===''?null:+tx])}}
 save();render()}
-function exp(){$('bk').value=JSON.stringify(S)}
-function imp(){try{const x=JSON.parse($('bk').value);if(!x.lots||!x.funds)throw 0;S=x;fix();save();render()}catch(e){alert('內容格式不正確，無法還原')}}
+async function exp(){$('bk').value=await seal()}
+async function imp(){const v=$('bk').value.trim();try{let x;if(v[0]==='{'&&JSON.parse(v).lots){x=JSON.parse(v)}else{const pin=prompt('請輸入這份備份當時設定的 PIN');if(!pin)return;x=(await openBlob(v,pin)).data}if(!x.lots||!x.funds)throw 0;S=x;fix();save();render()}catch(e){alert('無法還原：內容不正確或 PIN 錯誤')}}
 document.addEventListener('change',e=>{const t=e.target,ds=t.dataset;
 if(t.id==='mc'){$('mp').value=S.prices[t.value]||'';sim();return}
 if(t.id==='rt'){rtf();return}
@@ -199,5 +222,5 @@ else if(ds.rt!==undefined){RT=ds.rt;render()}
 else if(ds.dl!==undefined){if(confirm('刪除這筆買進？')){S.lots.splice(+ds.dl,1);save();render()}}
 else if(ds.ds!==undefined){if(confirm('刪除這筆賣出？')){S.sells.splice(+ds.ds,1);save();render()}}
 else if(ds.dm!==undefined){if(confirm('刪除這筆股息？')){S.mdiv.splice(+ds.dm,1);save();render()}}});
-render();
+boot();
 </script></body></html>
