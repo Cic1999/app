@@ -1,0 +1,197 @@
+<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>小記帳</title>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#FFF6EE;--card:#fff;--ink:#4A3F55;--mute:#9A8FA6;--line:#F6E6EC;--pri:#FF8FB1;--pri2:#FFB36B;--ok:#5ED3C0;--warn:#FFB020;--bad:#FF6B6B;--shadow:0 4px 14px rgba(255,143,177,.18);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#2B2433;--card:#383043;--ink:#F6EDF3;--mute:#B3A5BF;--line:#4A4057;--shadow:0 4px 14px rgba(0,0,0,.25)}}
+:root[data-theme="dark"]{--bg:#2B2433;--card:#383043;--ink:#F6EDF3;--mute:#B3A5BF;--line:#4A4057;--shadow:0 4px 14px rgba(0,0,0,.25)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+button,input,select{font-family:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font:500 15px/1.5 'Zen Maru Gothic','PingFang TC','Noto Sans TC','Microsoft JhengHei',sans-serif}
+.app{max-width:480px;margin:auto;padding:14px 14px 160px}
+h2{margin:0;font-size:19px;font-weight:900}h3{margin:0 0 8px;font-size:16px}.t{margin:4px 4px 12px}
+small{color:var(--mute);font-size:12.5px}
+.hd{display:flex;justify-content:space-between;align-items:center}.logo{font-weight:900;font-size:24px;margin:4px 4px 0;color:var(--pri)}
+.gear{border:0;background:var(--card);width:38px;height:38px;border-radius:50%;font-size:18px;box-shadow:var(--shadow);color:var(--ink)}
+.mnav{display:flex;align-items:center;justify-content:space-between;margin:8px 0 12px}
+.mnav button{border:0;background:var(--card);width:38px;height:38px;border-radius:50%;font-size:20px;color:var(--ink);box-shadow:var(--shadow)}
+.card{background:var(--card);border-radius:20px;padding:14px;margin-bottom:12px;box-shadow:var(--shadow)}
+.sum{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.sum div{background:var(--card);border-radius:18px;padding:10px;box-shadow:var(--shadow);border-top:5px solid var(--c)}
+.sum small{display:block}.sum b{font-size:14px;font-weight:900}
+.bar{height:12px;background:var(--line);border-radius:9px;overflow:hidden;margin:8px 0 4px}.bar i{display:block;height:100%;border-radius:9px;transition:width .4s}
+.bc.warn{background:rgba(255,176,32,.2)}.bc.bad{background:rgba(255,107,107,.2)}.bc{padding:12px 14px;margin-bottom:10px}
+.bh{display:flex;align-items:center;gap:10px}.bh b{flex:1}
+.day{font-weight:900;color:var(--mute);font-size:13px;margin:12px 4px 6px}
+.row{display:flex;align-items:center;gap:10px;background:var(--card);border-radius:18px;padding:10px 8px 10px 12px;margin-bottom:8px;box-shadow:var(--shadow)}
+.ic{width:42px;height:42px;border-radius:15px;display:grid;place-items:center;font-size:22px;flex:none}
+.mid{flex:1;min-width:0}.mid b{display:block}.mid small{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.amt{font-weight:900}.amt.exp{color:#FF6B8A}.amt.inc{color:#2DBFA8}
+.x{border:0;background:none;color:var(--mute);font-size:15px;padding:6px}
+.empty{text-align:center;padding:26px 10px;font-size:46px}.empty p{font-size:15px;color:var(--mute);margin:6px 0 14px}
+.btn{border:0;border-radius:18px;padding:13px;width:100%;font-weight:900;font-size:16px;color:#fff;background:linear-gradient(90deg,var(--pri),var(--pri2));box-shadow:var(--shadow)}
+.btn.ghost{background:var(--card);color:var(--pri);width:auto;padding:10px 18px}.btn.ghost.del{width:100%;margin-top:8px;color:var(--bad)}.btn.s{width:auto;padding:8px 14px;font-size:14px}
+.hero{background:linear-gradient(135deg,var(--pri),var(--pri2));color:#fff}.hero small{color:#fffc}.hero b{display:block;font-size:28px;font-weight:900}
+.qs{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 10px;margin:0 -2px}.qk{flex:none;border:0;background:var(--card);border-radius:18px;padding:8px 12px;font-weight:700;color:var(--ink);box-shadow:var(--shadow);display:flex;flex-direction:column;align-items:center;font-size:12px;gap:2px}.qk i{font-style:normal;font-size:24px}
+nav{position:fixed;left:0;right:0;bottom:0;max-width:480px;margin:auto;display:flex;background:var(--card);border-radius:24px 24px 0 0;box-shadow:0 -4px 18px rgba(255,143,177,.2);padding:8px 6px calc(8px + env(safe-area-inset-bottom,0px));z-index:10}
+nav button{flex:1;border:0;background:none;color:var(--mute);font-size:11px;font-weight:700;display:flex;flex-direction:column;align-items:center;padding:4px 0}
+nav b{font-size:22px;filter:grayscale(.8);opacity:.7;transition:.2s}nav button.on{color:var(--pri)}nav button.on b{filter:none;opacity:1;transform:translateY(-2px) scale(1.15)}
+.fab{position:fixed;right:max(16px,calc(50% - 224px));bottom:calc(88px + env(safe-area-inset-bottom,0px));width:58px;height:58px;border-radius:50%;border:0;font-size:32px;color:#fff;background:linear-gradient(135deg,var(--pri),var(--pri2));box-shadow:0 6px 18px rgba(255,143,177,.5);z-index:9}
+#modal:empty{display:none}.back{position:fixed;inset:0;background:#0006;z-index:20}
+.sheet{position:fixed;left:0;right:0;bottom:0;max-width:480px;margin:auto;background:var(--card);border-radius:28px 28px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom,0px));z-index:21;max-height:92vh;overflow:auto}
+.stk{position:sticky;top:-16px;background:var(--card);padding-top:4px;z-index:2}
+.seg{display:flex;background:var(--line);border-radius:16px;padding:4px;margin-bottom:10px}.seg button{flex:1;border:0;background:none;padding:9px;border-radius:13px;font-weight:900;color:var(--mute);font-size:15px}.seg button.on{background:var(--card);color:var(--pri);box-shadow:var(--shadow)}
+input,select{width:100%;border:2px solid var(--line);background:var(--bg);color:var(--ink);border-radius:14px;padding:10px 12px;font-size:15px;outline:0;margin-bottom:10px}input:focus,select:focus{border-color:var(--pri)}
+.disp{text-align:right;padding:2px 6px 8px}.disp small{display:block;min-height:18px}.disp b{font-size:34px;font-weight:900;color:var(--pri);word-break:break-all}
+.kp{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px}.k{border:0;border-radius:14px;height:42px;font-size:18px;font-weight:700;background:var(--line);color:var(--ink)}.k.op{background:color-mix(in srgb,var(--pri2) 35%,transparent)}.k.z{grid-column:span 2}.k:active{transform:scale(.94)}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
+.cat{border:2px solid transparent;background:color-mix(in srgb,var(--c) 20%,transparent);border-radius:16px;padding:8px 0;font-size:12px;font-weight:700;color:var(--ink);display:flex;flex-direction:column;align-items:center}.cat span{font-size:26px}.cat.on{border-color:var(--c);transform:scale(1.06)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}.chip{border:2px solid transparent;background:var(--line);border-radius:14px;padding:6px 10px;font-size:14px;font-weight:700;color:var(--ink)}.chip.on{border-color:var(--pri);background:color-mix(in srgb,var(--pri) 22%,transparent)}
+.lbl{font-size:13px;color:var(--mute);font-weight:700;margin:4px 2px 6px}.hint{background:var(--line);border-radius:14px;padding:8px 12px;font-size:13px;margin-bottom:10px}
+.f2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.donut{width:200px;height:200px;border-radius:50%;margin:8px auto 16px;display:grid;place-items:center}.donut div{width:130px;height:130px;border-radius:50%;background:var(--card);display:grid;place-content:center;text-align:center}.donut b{font-weight:900}
+.lg{display:flex;align-items:center;gap:6px;padding:7px 0;border-bottom:1px dashed var(--line)}.lg em{margin-left:auto;font-style:normal;color:var(--mute);font-size:13px}.lg b{min-width:84px;text-align:right}.dot{width:10px;height:10px;border-radius:50%}
+.chart{display:flex;align-items:flex-end;gap:2px;height:110px;margin-top:6px}.col{flex:1;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center}.col i{width:100%;min-height:3px;border-radius:5px 5px 2px 2px;background:linear-gradient(var(--pri),var(--pri2))}.col small{font-size:9px;height:12px}
+.inp{display:flex;align-items:center;gap:6px}.inp input{margin:0}
+.goal{display:flex;align-items:center;gap:12px}.gm{flex:1;min-width:0}.gm small{display:block}
+.ring{width:64px;height:64px;border-radius:50%;display:grid;place-items:center;flex:none}.ring span{width:48px;height:48px;border-radius:50%;background:var(--card);display:grid;place-items:center;font-size:24px}
+#toast{position:fixed;left:50%;bottom:calc(160px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);max-width:88vw;text-align:center;background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:20px;opacity:0;pointer-events:none;transition:.25s;z-index:30;font-weight:700}#toast.on{opacity:1;transform:translate(-50%,0);pointer-events:auto}#toast u{margin-left:8px;color:var(--pri2)}
+.stk2{display:flex;height:16px;border-radius:9px;overflow:hidden;margin:8px 0}.stk2 i{display:block;height:100%}
+</style></head><body>
+<div class="app" id="main"></div><button class="fab" onclick="openAdd()" aria-label="記一筆">＋</button>
+<nav><button data-v="home" onclick="go('home')"><b>💌</b>記帳</button><button data-v="stats" onclick="go('stats')"><b>🍩</b>統計</button><button data-v="budget" onclick="go('budget')"><b>🍰</b>預算</button><button data-v="accts" onclick="go('accts')"><b>👛</b>帳戶</button><button data-v="goals" onclick="go('goals')"><b>🌟</b>目標</button></nav>
+<div id="modal"></div><div id="toast"></div>
+<script>
+const IC=['🌸','🍓','🍑','🍒','🍬','🧸','🐰','🐱','🎀','💖','🫧','🍀','🍞','🍱','🍜','🧋','🍰','🌷','🎬','🛍️','🐾','🦄'];
+const IG=[['錢包卡片',['👛','👝','💳','🪙','💰','💎','🧧','🎀']],['可愛動物',['🐱','🐰','🐻','🐼','🦊','🐶','🐹','🦄','🐥']],['甜點水果',['🍓','🍑','🍒','🍬','🍰','🧁','🍩','🍡','🍙','🧋']],['花花星星',['🌸','🌷','🌼','🌻','🌟','✨','💖','🫧','🍀','🌈']],['穿搭美妝',['👗','👜','👟','💄','💍','🎒','🕶️','👒']],['生活出遊',['🍞','🍱','🍜','🚆','🚌','🎬','🛍️','🐾','✈️','📱','🏠','🎁']]];
+const SUB={food:[['🍳','早餐'],['🍱','午餐'],['🍜','晚餐'],['🍢','宵夜'],['🍰','點心'],['🥗','自煮'],['🍕','聚餐']],drink:[['🧋','手搖'],['☕','咖啡'],['🍵','茶'],['🥤','汽水'],['🍷','酒']],trans:[['🚌','公車'],['🚆','火車'],['🚇','捷運'],['🚕','計程車'],['🛵','機車'],['⛽','加油'],['🅿️','停車']],shop:[['👗','衣服'],['👜','包包'],['👟','鞋子'],['💄','美妝'],['💍','飾品'],['🧸','小物'],['🎁','禮物']],fun:[['🎬','電影'],['🎮','遊戲'],['🎤','KTV'],['🎡','遊樂園'],['📖','書'],['🎧','音樂']],daily:[['🧴','保養'],['🧼','清潔'],['🧻','衛生用品'],['🪥','盥洗']],home:[['🏠','房租'],['💡','水電'],['🌐','網路'],['📱','電話費'],['🛋️','家具'],['🪴','植物']],med:[['🩹','診所'],['💊','藥品'],['🦷','牙齒'],['👓','眼鏡']],learn:[['✏️','文具'],['📖','課程'],['💻','3C']],trip:[['✈️','機票'],['🏨','住宿'],['🎫','門票'],['🧳','行李']],pet:[['🍖','飼料'],['🏥','看診'],['🧶','玩具']]};
+const EX=[['food','餐飲','🍙','#FF9F6B'],['drink','飲料','🧋','#FF8FB1'],['trans','交通','🚌','#6EB6FF'],['shop','購物','🛍️','#B79CFF'],['fun','娛樂','🎬','#FFD34D'],['daily','日用','🫧','#5ED3C0'],['home','居家','🪴','#A0D468'],['med','醫療','🩹','#FF7A7A'],['learn','學習','✏️','#7C9CFF'],['trip','旅遊','🌴','#4FC3F7'],['pet','寵物','🐾','#F6B26B'],['other','其他','🎈','#C0A5E8']];
+const IN=[['salary','薪水','💝','#FFC94D'],['bonus','額外收入','🎁','#FF8FB1'],['invest','股票','📈','#5ED3C0'],['oin','其他收入','🍀','#B79CFF']];
+const CAT={};[...EX,...IN].forEach(c=>CAT[c[0]]={n:c[1],i:c[2],c:c[3]});
+const $=s=>document.querySelector(s),pad=n=>String(n).padStart(2,'0'),ymd=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+const fmt=n=>'NT$ '+Math.round(n).toLocaleString('en-US'),esc=s=>String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const def=()=>({tx:[],acc:[],bud:[],g:[],sc:[{id:'s1',n:'早餐',i:'🍞',cat:'food'},{id:'s2',n:'午餐',i:'🍱',cat:'food'},{id:'s3',n:'晚餐',i:'🍜',cat:'food'}],set:{start:1},rec:[],la:''});
+function load(){try{const v=JSON.parse(localStorage.getItem('kk2'));if(v&&v.tx){v.rec=v.rec||[];return v}}catch(e){}return def()}
+function save(){try{localStorage.setItem('kk2',JSON.stringify(S))}catch(e){}}
+let S=load(),view='home',M=null,E=null,FN=null,tt,last=null;
+const addD=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x};
+const perOf=d=>{const s=S.set.start;let y=d.getFullYear(),m=d.getMonth()+1;if(d.getDate()<s){m--;if(m<1){m=12;y--}}return PR(y,m)};
+const wkR=()=>{const t=new Date(),[a,b]=perOf(t),a0=new Date(a+'T00:00'),i=Math.floor(Math.round((new Date(ymd(t)+'T00:00')-a0)/864e5)/7),s=ymd(addD(a0,i*7)),e=ymd(addD(a0,i*7+7));return[s,e<b?e:b]};
+const pm0=()=>{const t=new Date();let y=t.getFullYear(),m=t.getMonth()+1;if(t.getDate()<S.set.start){m--;if(m<1){m=12;y--}}return[y,m]};
+const PR=(y,m)=>{const s=S.set.start;let y2=y,m2=m+1;if(m2>12){m2=1;y2++}return[y+'-'+pad(m)+'-'+pad(s),y2+'-'+pad(m2)+'-'+pad(s)]};
+const rg=(a,b)=>{const x=new Date(a+'T00:00'),e=addD(new Date(b+'T00:00'),-1);return `${x.getMonth()+1}/${x.getDate()} ~ ${e.getMonth()+1}/${e.getDate()}`};
+let PM=pm0();
+const sum=(a,t)=>a.filter(x=>x.type===t).reduce((s,x)=>s+x.amt,0),mtx=()=>{const[a,b]=PR(...PM);return S.tx.filter(t=>t.date>=a&&t.date<b)};
+function toast(m){const e=$('#toast');e.innerHTML=m;e.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>e.classList.remove('on'),3400)}
+function shift(n){let[y,m]=PM;m+=n;if(m<1){m=12;y--}if(m>12){m=1;y++}PM=[y,m];render()}
+function go(v){view=v;render();scrollTo(0,0)}
+const mhead=()=>{const[a,b]=PR(...PM),[y,m]=PM,s=S.set.start>1;return `<div class="mnav"><button onclick="shift(-1)">‹</button><div style="text-align:center"><h2>${y}年${m}月${s?'帳期':''}</h2>${s?`<small>${rg(a,b)}</small>`:''}</div><button onclick="shift(1)">›</button></div>`};
+const bar=(p,c)=>`<div class="bar"><i style="width:${Math.min(p,1)*100}%;background:${p>=1?'var(--bad)':p>=.8?'var(--warn)':c}"></i></div>`;
+const brange=b=>b.p==='week'?wkR():PR(...pm0());
+const bspent=b=>{const[a,e]=brange(b);return S.tx.filter(t=>t.type==='exp'&&t.date>=a&&t.date<e&&(!b.cats.length||b.cats.includes(t.cat))).reduce((s,t)=>s+t.amt,0)};
+const bfor=c=>S.bud.filter(b=>!b.cats.length||b.cats.includes(c));
+function bcard(b,fn){const s=bspent(b),p=b.amt?s/b.amt:0,[a,e]=brange(b);return `<div class="card bc ${p>=1?'bad':p>=.8?'warn':''}" onclick="${fn}"><div class="bh"><span style="font-size:24px">${b.i}</span><b>${esc(b.n)}<small>　${b.p==='week'?'每週':'每月'}　${rg(a,e)}</small></b><b style="flex:none;font-size:14px">${fmt(s)} / ${fmt(b.amt)}</b></div>${bar(p,'var(--ok)')}<small>${p>=1?'😱 已超支 '+fmt(s-b.amt):p>=.8?'⚠️ 快用完囉，還剩 '+fmt(b.amt-s):'還剩 '+fmt(b.amt-s)}　（${b.cats.length?b.cats.map(c=>CAT[c].n).join('、'):'全部支出'}）</small></div>`}
+function row(t){const a=S.acc.find(x=>x.id===t.acc),X=`<button class="x" onclick="del('${t.id}')" aria-label="刪除">✕</button>`;
+if(t.type==='tf'){const b=S.acc.find(x=>x.id===t.to);return `<div class="row"><div class="ic" style="background:var(--line)">🔄</div><div class="mid"><b>轉帳${t.note?'・'+esc(t.note):''}</b><small>${a?esc(a.n):'?'} → ${b?esc(b.n):'?'}</small></div><div class="amt">${Math.round(t.amt).toLocaleString('en-US')}</div>${X}</div>`}
+const c=CAT[t.cat],sb=(SUB[t.cat]||[]).find(x=>x[1]===t.sub);return `<div class="row"><div class="ic" style="background:${c.c}33">${sb?sb[0]:c.i}</div><div class="mid"><b>${c.n}${sb?'・'+sb[1]:''}</b><small>${t.rid?'🔁 ':''}${a?a.i+' '+esc(a.n):''}${a&&t.note?' · ':''}${esc(t.note)}</small></div><div class="amt ${t.type}">${t.type==='inc'?'+':'-'}${Math.round(t.amt).toLocaleString('en-US')}</div>${X}</div>`}
+function home(){const m=mtx(),inc=sum(m,'inc'),exp=sum(m,'exp');
+const bs=S.bud.length?S.bud.map(b=>bcard(b,"go('budget')")).join(''):`<div class="card" onclick="go('budget')"><b>🍰 還沒設定預算</b><br><small>點這裡，設定你需要的週預算或月預算</small></div>`;
+const qs=`<div class="qs">${S.sc.map(s=>`<button class="qk" onclick="openAdd('${s.id}')"><i>${s.i}</i>${esc(s.n)}</button>`).join('')}<button class="qk" onclick="go('set')"><i>➕</i>快捷</button></div>`;
+const days=[...new Set(m.map(t=>t.date))].sort().reverse();
+let list=days.map(d=>{const[,mm,dd]=d.split('-');return `<div class="day">${+mm}/${+dd} 週${'日一二三四五六'[new Date(d+'T00:00').getDay()]}</div>`+m.filter(t=>t.date===d).reverse().map(row).join('')}).join('');
+if(!m.length)list=`<div class="empty">🫧<p>這個帳期還沒有記錄<br>按快捷或右下角的 ＋ 開始記帳吧！</p><button class="btn ghost" onclick="demo()">載入範例資料看看</button></div>`;
+return `<div class="hd"><div class="logo">🍓 小記帳</div><button class="gear" onclick="go('set')" aria-label="設定">⚙️</button></div>${mhead()}<div class="sum"><div style="--c:#5ED3C0"><small>收入</small><b>${fmt(inc)}</b></div><div style="--c:#FF8FB1"><small>支出</small><b>${fmt(exp)}</b></div><div style="--c:#FFB36B"><small>結餘</small><b>${fmt(inc-exp)}</b></div></div>${bs}${qs}${list}`}
+function stats(){const m=mtx(),ex=m.filter(t=>t.type==='exp'),inc=sum(m,'inc'),tot=sum(m,'exp'),[a,b]=PR(...PM),cc=S.acc.filter(x=>x.k==='cc');
+const byI={};m.filter(t=>t.type==='inc').forEach(t=>byI[t.cat]=(byI[t.cat]||0)+t.amt);const ai=Object.entries(byI).sort((x,y)=>y[1]-x[1]);
+const lg=(k,v,T)=>`<div class="lg"><span class="dot" style="background:${CAT[k].c}"></span>${CAT[k].i} ${CAT[k].n}<em>${Math.round(v/T*100)}%</em><b>${fmt(v)}</b></div>`;
+let h=mhead()+`<div class="sum"><div style="--c:#5ED3C0"><small>總收入</small><b>${fmt(inc)}</b></div><div style="--c:#FF8FB1"><small>總支出</small><b>${fmt(tot)}</b></div><div style="--c:#FFB36B"><small>剩餘金額</small><b>${fmt(inc-tot)}</b></div></div>`;
+if(inc)h+=`<div class="card"><h3>💰 收入來源</h3><div class="stk2">${ai.map(([k,v])=>`<i style="flex:${v};background:${CAT[k].c}"></i>`).join('')}</div>${ai.map(([k,v])=>lg(k,v,inc)).join('')}</div>`;
+if(S.acc.length){let nu=0;m.forEach(t=>{if(t.type!=='tf'&&!S.acc.some(x=>x.id===t.acc))nu+=t.type==='inc'?t.amt:-t.amt});
+h+=`<div class="card"><h3>👛 帳戶變化（期初 → 期末）</h3>${S.acc.map(x=>`<div class="lg">${x.i} ${esc(x.n)}<em>${fmt(balAt(x,a))} →</em><b>${fmt(balAt(x,b))}</b></div>`).join('')}${nu?`<div class="lg">🫧 未指定帳戶<em>本期</em><b>${nu>0?'+':'-'}${fmt(Math.abs(nu))}</b></div>`:''}<small>各帳戶增減加總 ＝ 剩餘金額${nu?'（含未指定帳戶）':''}</small></div>`}
+if(cc.length)h+=`<div class="card"><h3>💳 信用卡卡費</h3>${cc.map(x=>{const sw=ex.filter(t=>t.acc===x.id).reduce((s,t)=>s+t.amt,0),pd=m.filter(t=>t.type==='tf'&&t.to===x.id).reduce((s,t)=>s+t.amt,0),ow=-balAt(x,b);return `<div class="lg">${x.i} ${esc(x.n)}<em>本期刷卡 ${fmt(sw)}</em><b>${ow>0?'未繳 '+fmt(ow):'已繳清'}</b></div>${pd?`<small>　本期已繳 ${fmt(pd)}</small>`:''}`}).join('')}<small>用「轉帳」把銀行或現金轉到信用卡，就是繳卡費</small></div>`;
+if(tot){const by={};ex.forEach(t=>by[t.cat]=(by[t.cat]||0)+t.amt);const arr=Object.entries(by).sort((x,y)=>y[1]-x[1]);let acc=0;
+const stops=arr.map(([k,v])=>{const s=acc/tot*100;acc+=v;return `${CAT[k].c} ${s}% ${acc/tot*100}%`}).join(',');
+const dl=[];for(let d=new Date(a+'T00:00');ymd(d)<b;d=addD(d,1))dl.push(ymd(d));
+const ds=dl.map(x=>ex.filter(t=>t.date===x).reduce((s,t)=>s+t.amt,0)),mx=Math.max(...ds,1);
+h+=`<div class="card"><h3>🍩 支出分類</h3><div class="donut" style="background:conic-gradient(${stops})"><div><small>總支出</small><b>${fmt(tot)}</b></div></div>${arr.map(([k,v])=>lg(k,v,tot)).join('')}</div><div class="card"><h3>📅 每日支出</h3><div class="chart">${ds.map((v,i)=>`<div class="col"><i style="height:${v/mx*100}%"></i><small>${i%5===0?+dl[i].slice(8):''}</small></div>`).join('')}</div></div>`}
+else h+=`<div class="card empty">🍩<p>這個帳期還沒有支出資料</p></div>`;
+return h}
+function budget(){return `<h2 class="t">🍰 我的預算</h2>`+(S.bud.length?S.bud.map(b=>bcard(b,`editBud('${b.id}')`)).join(''):`<div class="card empty">🍰<p>想抓哪種預算都可以～<br>每週生活費、每月娛樂、全部支出…<br>只設定你需要的就好</p></div>`)+`<button class="btn" onclick="editBud()">＋ 新增預算</button>`}
+const dl=(t,id)=>t.type==='tf'?(t.acc===id?-t.amt:0)+(t.to===id?t.amt:0):t.acc===id?(t.type==='inc'?t.amt:-t.amt):0;
+const balAt=(a,e)=>S.tx.filter(t=>t.date<e).reduce((s,t)=>s+dl(t,a.id),+a.b||0);
+function accts(){const[pa,pb]=PR(...PM);
+const rows=S.acc.map(a=>{const o=balAt(a,pa),c=balAt(a,pb);return `<div class="row" onclick="editAcc('${a.id}')"><div class="ic" style="background:var(--line)">${a.i}</div><div class="mid"><b>${esc(a.n)}${a.k==='cc'?' <small>信用卡</small>':''}</b><small>期初 ${fmt(o)}　本期 ${c-o>=0?'+':'-'}${fmt(Math.abs(c-o))}</small></div><div class="amt ${c<0?'exp':'inc'}">${fmt(c)}</div></div>`}).join('');
+const tot=S.acc.reduce((s,a)=>s+balAt(a,pb),0),to=S.acc.reduce((s,a)=>s+balAt(a,pa),0);
+return `<h2 class="t">👛 我的帳戶</h2>`+(S.acc.length?mhead()+`<div class="card hero"><small>帳期結束時總餘額（期初 ${fmt(to)}）</small><b>${fmt(tot)}</b></div>${rows}<small style="display:block;margin:0 4px 12px">餘額 ＝ 起始餘額 ＋ 收入 － 支出，轉帳會在兩個帳戶間移動；信用卡刷卡會變負數（＝未繳卡費）。</small>`:`<div class="card empty">👛<p>還沒有帳戶<br>沒有帳戶也能記帳，想追蹤再新增就好</p></div>`)+`<button class="btn" onclick="editAcc()">＋ 新增帳戶</button>`}
+function goals(){return `<h2 class="t">🌟 存錢目標</h2>`+(S.g.length?S.g.map(g=>{const p=Math.min(g.s/g.t,1),rem=g.t-g.s;let due='';
+if(g.due&&rem>0){const dd=Math.ceil((new Date(g.due+'T00:00')-new Date(ymd(new Date())+'T00:00'))/864e5);due=dd<0?`<small>⏰ 已超過預計日 ${g.due}</small>`:`<small>🎯 預計 ${g.due} 完成（還有 ${dd} 天）</small><small>約每月存 ${fmt(rem/Math.max(dd/30.4,1))}，每週 ${fmt(rem/Math.max(dd/7,1))}</small>`}else if(g.due)due=`<small>🎯 預計 ${g.due} 完成</small>`;
+return `<div class="card goal"><div class="ring" style="background:conic-gradient(var(--pri) ${p*100}%,var(--line) 0)"><span>${g.i}</span></div><div class="gm"><b>${esc(g.n)}</b><small>${fmt(g.s)} / ${fmt(g.t)}（${Math.round(p*100)}%）</small>${due}${p>=1?'<small>🎉 目標達成啦！</small>':`<div class="inp"><input id="d${g.id}" type="number" inputmode="numeric" placeholder="存入金額" style="margin-top:6px"><button class="btn s" onclick="dep('${g.id}')">存入</button></div>`}</div><button class="x" onclick="editGoal('${g.id}')" aria-label="編輯目標">✏️</button></div>`}).join(''):`<div class="card empty">🦄<p>還沒有目標<br>按下面的按鈕新增第一個吧！</p></div>`)+`<button class="btn" onclick="editGoal()">＋ 新增目標</button>`}
+function set(){const s=S.set;return `<div class="hd"><button class="gear" onclick="go('home')" aria-label="返回">‹</button><h2>⚙️ 設定</h2><span style="width:38px"></span></div><div class="card" style="margin-top:12px"><h3>📅 每月帳期起始日</h3><select onchange="setSt(this.value)">${Array.from({length:28},(_,i)=>`<option value="${i+1}" ${s.start===i+1?'selected':''}>每月 ${i+1} 號開始</option>`).join('')}</select><small>${s.start===1?'依一般日曆月份計算':`每月 ${s.start} 號到下個月 ${s.start-1} 號算一個月（例如發薪日是 ${s.start} 號）`}。統計和每月預算都跟著帳期。每週預算則從帳期第一天起每 7 天算一週，最後一週不足 7 天就算到帳期結束。</small></div><div class="card"><h3>🔁 每月固定支出</h3><small>火車月票、手機電話費…設定好之後，每月那一天會自動幫你記帳</small>${S.rec.map(r=>`<div class="row" style="margin-top:8px" onclick="editRec('${r.id}')"><div class="ic" style="background:var(--line)">${r.i}</div><div class="mid"><b>${esc(r.n)}</b><small>每月 ${r.day} 號・${CAT[r.cat].n}</small></div><div class="amt exp">${fmt(r.amt)}</div></div>`).join('')}<button class="btn" style="margin-top:10px" onclick="editRec()">＋ 新增固定支出</button></div><div class="card"><h3>⚡ 快捷記帳</h3><small>點快捷就能直接輸入金額，例如早餐、午餐、晚餐</small>${S.sc.map(x=>`<div class="row" style="margin-top:8px" onclick="editSc('${x.id}')"><div class="ic" style="background:var(--line)">${x.i}</div><div class="mid"><b>${esc(x.n)}</b><small>${CAT[x.cat].i} ${CAT[x.cat].n}</small></div><span>✏️</span></div>`).join('')}<button class="btn" style="margin-top:10px" onclick="editSc()">＋ 新增快捷</button></div><p style="text-align:center"><button class="btn ghost" onclick="wipe(this)">清除所有資料</button></p>`}
+function render(){$('#main').innerHTML=({home,stats,budget,accts,goals,set})[view]();document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===view))}
+function sh(h){const o=$('.sheet'),st=o?o.scrollTop:0;$('#modal').innerHTML=`<div class="back" onclick="closeM()"></div><div class="sheet">${h}</div>`;$('.sheet').scrollTop=st}
+function closeM(){$('#modal').innerHTML=''}
+function openAdd(id){const s=S.sc.find(x=>x.id===id),sm=s&&(SUB[s.cat]||[]).some(x=>x[1]===s.n);M={type:'exp',cat:s?s.cat:'food',sub:sm?s.n:'',note:s&&!sm?s.n:'',expr:'',acc:S.acc.some(a=>a.id===S.la)?S.la:'',to:'',date:ymd(new Date())};modal()}
+const KP=['C','⌫','÷','×','7','8','9','−','4','5','6','+','1','2','3','=','0','00','.'];
+function hint(){if(M.type!=='exp')return'';const l=bfor(M.cat).map(b=>{const r=b.amt-bspent(b);return `${b.i} ${esc(b.n)}（${b.p==='week'?'本週':'本月'}）${r>=0?'還剩 '+fmt(r):'已超支 '+fmt(-r)}`});return l.length?`<div class="hint">${l.join('<br>')}</div>`:''}
+function modal(){const L=M.type==='exp'?EX:IN,tf=M.type==='tf',sb=tf?[]:(SUB[M.cat]||[]),chip=(a,f,v)=>`<button class="chip ${v===a.id?'on':''}" onclick="${f}='${a.id}';modal()">${a.i} ${esc(a.n)}</button>`;
+sh(`<div class="stk"><div class="seg">${[['exp','支出'],['inc','收入'],['tf','轉帳']].map(x=>`<button class="${M.type===x[0]?'on':''}" onclick="setT('${x[0]}')">${x[1]}</button>`).join('')}</div><div id="disp" class="disp"></div></div><div class="kp">${KP.map(k=>`<button class="k ${'C⌫÷×−+='.includes(k)?'op':''} ${k==='0'?'z':''}" onclick="key('${k}')">${k}</button>`).join('')}</div>`
++(tf?`<div class="lbl">從哪個帳戶出（例如銀行）</div><div class="chips">${S.acc.map(a=>chip(a,'M.acc',M.acc)).join('')}</div><div class="lbl">轉到哪個帳戶（轉到信用卡＝繳卡費）</div><div class="chips">${S.acc.map(a=>chip(a,'M.to',M.to)).join('')}</div>${S.acc.length<2?'<div class="hint">轉帳需要至少兩個帳戶，先到「帳戶」頁新增喔</div>':''}`
+:`<div class="grid">${L.map(c=>`<button class="cat ${M.cat===c[0]?'on':''}" style="--c:${c[3]}" onclick="pick('${c[0]}')"><span>${c[2]}</span>${c[1]}</button>`).join('')}</div>${sb.length?`<div class="lbl">細項（選填）</div><div class="chips">${sb.map(x=>`<button class="chip ${M.sub===x[1]?'on':''}" onclick="M.sub=M.sub==='${x[1]}'?'':'${x[1]}';modal()">${x[0]} ${x[1]}</button>`).join('')}</div>`:''}${hint()}<div class="lbl">帳戶${S.acc.length?'':'（到「帳戶」頁新增後就能選）'}</div><div class="chips">${[{id:'',n:'不指定',i:'🫧'},...S.acc].map(a=>chip(a,'M.acc',M.acc)).join('')}</div>`)
++`<div class="f2"><input type="date" value="${M.date}" onchange="M.date=this.value"><input placeholder="備註（選填）" value="${esc(M.note)}" oninput="M.note=this.value"></div><button class="btn" onclick="saveTx()">記下來 ✨</button>`);disp()}
+function ev(s){s=s.replace(/×/g,'*').replace(/÷/g,'/').replace(/−/g,'-').replace(/[+\-*/.]+$/,'').replace(/(^|[^0-9.])0+(?=\d)/g,'$1');if(!s||!/^[0-9+\-*/.]+$/.test(s))return NaN;try{const v=Function('"use strict";return ('+s+')')();return isFinite(v)?Math.round(v*100)/100:NaN}catch(e){return NaN}}
+function disp(){const e=M.expr||'',v=ev(e),h=/[+−×÷]/.test(e);$('#disp').innerHTML=`<small>${h&&!isNaN(v)?'= '+fmt(v):'金額 NT$'}</small><b>${e||'0'}</b>`}
+function key(k){let e=M.expr||'';
+if(k==='C')e='';else if(k==='⌫')e=e.slice(0,-1);
+else if(k==='='){const v=ev(e);if(!isNaN(v))e=String(v)}
+else if('+−×÷'.includes(k)){if(!e)return;if('+−×÷'.includes(e.slice(-1)))e=e.slice(0,-1);e+=k}
+else if(k==='.'){const g=e.split(/[+−×÷]/).pop();if(g.includes('.'))return;e+=g?'.':'0.'}
+else e+=k;M.expr=e;disp()}
+function pick(c){M.cat=c;M.sub='';modal()}
+function setT(t){M.type=t;if(t!=='tf'){M.cat=t==='exp'?'food':'salary';M.sub=''}modal()}
+function saveTx(){const v=ev(M.expr||''),tf=M.type==='tf';if(!(v>0)){toast('請先輸入金額喔');return}
+if(tf&&(!M.acc||!M.to||M.acc===M.to)){toast('請選兩個不同的帳戶');return}
+const d=M.date||ymd(new Date());
+S.tx.push(Object.assign({id:uid(),type:M.type,amt:v,acc:M.acc,note:(M.note||'').trim(),date:d},tf?{to:M.to}:{cat:M.cat,sub:M.sub||''}));if(!tf)S.la=M.acc;save();
+const pa=perOf(new Date(d+'T00:00'))[0];PM=[+pa.slice(0,4),+pa.slice(5,7)];
+const w=[];if(M.type==='exp')bfor(M.cat).forEach(b=>{const[a,e]=brange(b);if(d<a||d>=e)return;const p=bspent(b)/b.amt;if(p>=1)w.push(`😱 「${esc(b.n)}」${b.p==='week'?'本週':'本月'}已超支`);else if(p>=.8)w.push(`⚠️ 「${esc(b.n)}」${b.p==='week'?'本週':'本月'}已用 ${Math.round(p*100)}%`)});
+closeM();render();toast(w.length?w.join('<br>'):'已記下 ✨')}
+function del(id){const i=S.tx.findIndex(t=>t.id===id);last=[i,S.tx[i]];S.tx.splice(i,1);save();render();toast('已刪除<u onclick="undo()">復原</u>')}
+function undo(){if(last){S.tx.splice(last[0],0,last[1]);last=null;save();render();toast('已復原')}}
+const icp=()=>`<div class="lbl">選一個喜歡的圖示</div>${IG.map(g=>`<div class="lbl" style="font-weight:500;margin:2px 2px 4px">${g[0]}</div><div class="chips">${g[1].map(i=>`<button class="chip ${E.i===i?'on':''}" onclick="E.i='${i}';FN()">${i}</button>`).join('')}</div>`).join('')}`;
+const c2=(b,f)=>{if(b.dataset.s)f();else{b.dataset.s=1;b.textContent='再按一次確認刪除'}};
+function editAcc(id){const a=S.acc.find(x=>x.id===id);E=a?{...a,k:a.k||'cash',bv:a.b?(a.k==='cc'?-a.b:a.b):''}:{id:'',n:'',i:'👛',b:0,k:'cash',bv:''};FN=fAcc;fAcc()}
+function fAcc(){sh(`<h3>${E.id?'編輯帳戶':'新增帳戶'}</h3><input placeholder="帳戶名稱（例如：悠遊卡）" value="${esc(E.n)}" oninput="E.n=this.value"><div class="seg"><button class="${E.k!=='cc'?'on':''}" onclick="E.k='cash';FN()">一般帳戶</button><button class="${E.k==='cc'?'on':''}" onclick="E.k='cc';FN()">信用卡</button></div><input type="number" inputmode="decimal" placeholder="${E.k==='cc'?'目前已刷未繳金額（選填，填正數）':'起始餘額（選填，例如月初現金 5000）'}" value="${E.bv||''}" oninput="E.bv=this.value"><small style="display:block;margin-bottom:8px">之後記的收入、支出、轉帳都會自動加減到這個帳戶</small>${icp()}<button class="btn" onclick="svAcc()">儲存</button>${E.id?`<button class="btn ghost del" onclick="c2(this,dlAcc)">刪除這個帳戶</button>`:''}`)}
+function svAcc(){const n=E.n.trim();if(!n){toast('請輸入帳戶名稱');return}const v=+E.bv||0,o={id:E.id||uid(),n,i:E.i,k:E.k,b:E.k==='cc'?-Math.abs(v):v};E.id?S.acc[S.acc.findIndex(a=>a.id===E.id)]=o:S.acc.push(o);save();closeM();render()}
+function dlAcc(){S.tx.forEach(t=>{if(t.acc===E.id)t.acc=''});S.acc=S.acc.filter(a=>a.id!==E.id);save();closeM();render()}
+function editBud(id){const b=S.bud.find(x=>x.id===id);E=b?{...b,cats:[...b.cats]}:{id:'',n:'',i:'🍰',p:'week',amt:'',cats:[]};FN=fBud;fBud()}
+function fBud(){sh(`<h3>${E.id?'編輯預算':'新增預算'}</h3><input placeholder="預算名稱（例如：生活費）" value="${esc(E.n)}" oninput="E.n=this.value"><div class="seg"><button class="${E.p==='week'?'on':''}" onclick="E.p='week';FN()">每週</button><button class="${E.p==='month'?'on':''}" onclick="E.p='month';FN()">每月（依帳期）</button></div><input type="number" inputmode="numeric" placeholder="預算金額（NT$）" value="${E.amt||''}" oninput="E.amt=this.value"><div class="lbl">要計入哪些支出？（都不選＝全部支出）</div><div class="chips">${EX.map(c=>`<button class="chip ${E.cats.includes(c[0])?'on':''}" onclick="tg('${c[0]}')">${c[2]} ${c[1]}</button>`).join('')}</div>${icp()}<button class="btn" onclick="svBud()">儲存</button>${E.id?`<button class="btn ghost del" onclick="c2(this,dlBud)">刪除這個預算</button>`:''}`)}
+function tg(c){E.cats=E.cats.includes(c)?E.cats.filter(x=>x!==c):[...E.cats,c];FN()}
+function svBud(){const n=E.n.trim(),a=+E.amt;if(!n||!(a>0)){toast('請輸入名稱和預算金額');return}const o={id:E.id||uid(),n,i:E.i,p:E.p,amt:a,cats:E.cats};E.id?S.bud[S.bud.findIndex(b=>b.id===E.id)]=o:S.bud.push(o);save();closeM();render()}
+function dlBud(){S.bud=S.bud.filter(b=>b.id!==E.id);save();closeM();render()}
+function editSc(id){const s=S.sc.find(x=>x.id===id);E=s?{...s}:{id:'',n:'',i:'🍞',cat:'food'};FN=fSc;fSc()}
+function fSc(){sh(`<h3>${E.id?'編輯快捷':'新增快捷'}</h3><input placeholder="名稱（例如：早餐）" value="${esc(E.n)}" oninput="E.n=this.value"><div class="lbl">記到哪個分類</div><div class="chips">${EX.map(c=>`<button class="chip ${E.cat===c[0]?'on':''}" onclick="E.cat='${c[0]}';FN()">${c[2]} ${c[1]}</button>`).join('')}</div>${icp()}<button class="btn" onclick="svSc()">儲存</button>${E.id?`<button class="btn ghost del" onclick="c2(this,dlSc)">刪除這個快捷</button>`:''}`)}
+function svSc(){const n=E.n.trim();if(!n){toast('請輸入名稱');return}const o={id:E.id||uid(),n,i:E.i,cat:E.cat};E.id?S.sc[S.sc.findIndex(x=>x.id===E.id)]=o:S.sc.push(o);save();closeM();render()}
+function dlSc(){S.sc=S.sc.filter(x=>x.id!==E.id);save();closeM();render()}
+function setSt(v){S.set.start=+v;PM=pm0();save();render()}
+function dep(id){const v=+$('#d'+id).value,g=S.g.find(x=>x.id===id);if(!(v>0)){toast('請輸入存入金額');return}g.s+=v;save();render();toast(g.s>=g.t?'🎉 目標達成！':'存進去了 🌟')}
+function editGoal(id){const g=S.g.find(x=>x.id===id);E=g?{...g}:{id:'',n:'',i:'🦄',t:'',s:'',due:''};FN=fGoal;fGoal()}
+function fGoal(){sh(`<h3>${E.id?'編輯目標':'新增目標'}</h3><input placeholder="目標名稱，例如：日本旅行" value="${esc(E.n)}" oninput="E.n=this.value"><input type="number" inputmode="numeric" placeholder="目標金額（NT$）" value="${E.t||''}" oninput="E.t=this.value"><input type="number" inputmode="numeric" placeholder="目前已存（選填）" value="${E.s||''}" oninput="E.s=this.value"><div class="lbl">預計完成日（選填）</div><input type="date" value="${E.due||''}" onchange="E.due=this.value">${icp()}<button class="btn" onclick="svGoal()">儲存</button>${E.id?`<button class="btn ghost del" onclick="c2(this,dlGoal)">刪除這個目標</button>`:''}`)}
+function svGoal(){const n=E.n.trim(),t=+E.t;if(!n||!(t>0)){toast('請輸入名稱和目標金額');return}const o={id:E.id||uid(),n,i:E.i,t,s:+E.s||0,due:E.due||''};E.id?S.g[S.g.findIndex(x=>x.id===E.id)]=o:S.g.push(o);save();closeM();render()}
+function dlGoal(){S.g=S.g.filter(x=>x.id!==E.id);save();closeM();render()}
+function editRec(id){const r=S.rec.find(x=>x.id===id);E=r?{...r}:{id:'',n:'',i:'🚆',cat:'trans',sub:'',amt:'',day:1,acc:''};FN=fRec;fRec()}
+function fRec(){const sb=SUB[E.cat]||[];sh(`<h3>${E.id?'編輯固定支出':'新增固定支出'}</h3><input placeholder="名稱（例如：火車月票、手機電話費）" value="${esc(E.n)}" oninput="E.n=this.value"><input type="number" inputmode="numeric" placeholder="每月金額（NT$）" value="${E.amt||''}" oninput="E.amt=this.value"><div class="lbl">每月幾號自動記帳</div><select onchange="E.day=+this.value">${Array.from({length:28},(_,i)=>`<option value="${i+1}" ${E.day===i+1?'selected':''}>每月 ${i+1} 號</option>`).join('')}</select><small style="display:block;margin-bottom:8px">從下一次的這一天開始自動記入；已經過的日期請自己補記</small><div class="lbl">分類</div><div class="chips">${EX.map(c=>`<button class="chip ${E.cat===c[0]?'on':''}" onclick="E.cat='${c[0]}';E.sub='';FN()">${c[2]} ${c[1]}</button>`).join('')}</div>${sb.length?`<div class="lbl">細項（選填）</div><div class="chips">${sb.map(x=>`<button class="chip ${E.sub===x[1]?'on':''}" onclick="E.sub=E.sub==='${x[1]}'?'':'${x[1]}';FN()">${x[0]} ${x[1]}</button>`).join('')}</div>`:''}<div class="lbl">從哪個帳戶扣</div><div class="chips">${[{id:'',n:'不指定',i:'🫧'},...S.acc].map(a=>`<button class="chip ${E.acc===a.id?'on':''}" onclick="E.acc='${a.id}';FN()">${a.i} ${esc(a.n)}</button>`).join('')}</div>${icp()}<button class="btn" onclick="svRec()">儲存</button>${E.id?`<button class="btn ghost del" onclick="c2(this,dlRec)">刪除這個固定支出</button>`:''}`)}
+function svRec(){const n=E.n.trim(),a=+E.amt;if(!n||!(a>0)){toast('請輸入名稱和金額');return}let st=E.start;if(!st){const t=new Date();let y=t.getFullYear(),m=t.getMonth()+1;if(E.day<t.getDate()){m++;if(m>12){m=1;y++}}st=y+'-'+pad(m)}
+const o={id:E.id||uid(),n,i:E.i,cat:E.cat,sub:E.sub||'',amt:a,day:E.day,acc:E.acc,start:st,done:E.done||[]};E.id?S.rec[S.rec.findIndex(x=>x.id===E.id)]=o:S.rec.push(o);save();genRec();closeM();render()}
+function dlRec(){S.rec=S.rec.filter(x=>x.id!==E.id);save();closeM();render()}
+function genRec(){const t=ymd(new Date()),cy=+t.slice(0,4),cm=+t.slice(5,7);let ch=0;S.rec.forEach(r=>{let[y,m]=r.start.split('-').map(Number);while(y<cy||(y===cy&&m<=cm)){const d=y+'-'+pad(m)+'-'+pad(r.day);if(d<=t&&!r.done.includes(d)){S.tx.push({id:uid(),type:'exp',cat:r.cat,sub:r.sub||'',amt:r.amt,acc:r.acc,note:r.n,date:d,rid:r.id});r.done.push(d);ch=1}m++;if(m>12){m=1;y++}}});if(ch)save()}
+function wipe(b){if(b.dataset.s){S=def();PM=pm0();save();go('home');toast('已清除')}else{b.dataset.s=1;b.textContent='再按一次確認清除'}}
+function demo(){S=def();PM=pm0();const d=n=>ymd(addD(new Date(),-n));
+S.acc=[{id:'a1',n:'悠遊卡',i:'🐱',b:800,k:'cash'},{id:'a2',n:'信用卡',i:'💖',b:0,k:'cc'},{id:'a3',n:'銀行',i:'👛',b:30000,k:'cash'}];
+S.bud=[{id:'b1',n:'生活費',i:'🍰',p:'week',amt:2500,cats:['food','drink','fun']},{id:'b2',n:'每月總預算',i:'🌷',p:'month',amt:20000,cats:[]}];
+S.g=[{id:'g1',n:'日本旅行',i:'🦄',t:50000,s:12000,due:ymd(addD(new Date(),120))}];
+[[0,'exp','food',150,'a1','煎餃（含同事）','早餐'],[0,'exp','drink',55,'a1','紅茶','手搖'],[1,'exp','fun',320,'a2','','電影'],[2,'exp','shop',1280,'a2','','衣服'],[3,'exp','trans',150,'a1','','捷運'],[4,'inc','salary',38000,'a3','月薪',''],[4,'inc','invest',2000,'a3','股利','']].forEach(p=>S.tx.push({id:uid(),type:p[1],cat:p[2],amt:p[3],acc:p[4],note:p[5],sub:p[6],date:d(p[0])}));
+S.tx.push({id:uid(),type:'tf',amt:1000,acc:'a3',to:'a2',note:'繳卡費',date:d(1)});
+save();render()}
+genRec();
+render();
+</script></body></html>
